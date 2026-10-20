@@ -1,0 +1,27 @@
+name: CI Movie Recommender Validation
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install --upgrade pip nbformat
+      - name: Validate Recommender Notebook
+        run: |
+          python -c "
+          import nbformat
+          with open('app.ipynb', 'r', encoding='utf-8') as f:
+              nb = nbformat.read(f, as_version=4)
+          print(f'Successfully validated notebook: {len(nb.cells)} cells')
+          "
+      - name: Compile Streamlit app
+        run: python -m py_compile streamlit_app.py
